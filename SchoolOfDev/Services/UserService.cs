@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolOfDev.Entities;
+using SchoolOfDev.Exceptions;
 using SchoolOfDev.Helpers;
 using BC = BCrypt.Net.BCrypt;
 
@@ -26,14 +27,14 @@ namespace SchoolOfDev.Services
         {
 
             if (!user.Password.Equals(user.ConfirmPassword)) {
-                throw new Exception("Senhas não conferem.");
+                throw new BadRequestException("Senhas não conferem.");
             }
 
             User userDb = await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.UserName == user.UserName);
 
             if(userDb is not null)
             {
-                throw new Exception($"Usuário {user.UserName} já cadastro no sistema.");
+                throw new BadRequestException($"Usuário {user.UserName} já cadastro no sistema.");
             }
 
             user.Password = BC.HashPassword(user.Password);
@@ -50,7 +51,7 @@ namespace SchoolOfDev.Services
 
             if (userDb is null)
             {
-                throw new Exception("Usuário não localizado em nosso banco de dados.");
+                throw new KeyNotFoundException("Usuário não localizado em nosso banco de dados.");
             }
 
             _context.Users.Remove(userDb);
@@ -68,7 +69,7 @@ namespace SchoolOfDev.Services
 
             if (userDb is null)
             {
-                throw new Exception("Usuário não localizado em nosso banco de dados.");
+                throw new KeyNotFoundException("Usuário não localizado em nosso banco de dados.");
             }
 
             return userDb;
@@ -79,21 +80,21 @@ namespace SchoolOfDev.Services
 
             if (userIn.Id != id)
             {
-                throw new Exception("ID da rota é diferente do ID do usuário.");
+                throw new BadRequestException("ID da rota é diferente do ID do usuário.");
             }else if (!userIn.Password.Equals(userIn.ConfirmPassword))
             {
-                throw new Exception("Senhas não conferem.");
+                throw new BadRequestException("Senhas não conferem.");
             }
 
             User userDb = await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
 
             if (userDb is null)
             {
-                throw new Exception("Usuário não localizado em nosso banco de dados.");
+                throw new KeyNotFoundException("Usuário não localizado em nosso banco de dados.");
             }
             else if (!BC.Verify(userIn.CurrentPassword, userDb.Password))
             {
-                throw new Exception("Senha atual incorreta, não foi possivel alterar senha.");
+                throw new BadRequestException("Senha atual incorreta, não foi possivel alterar senha.");
             }
 
             userIn.CreatedAt = userDb.CreatedAt;

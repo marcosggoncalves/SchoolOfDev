@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolOfDev.Entities;
+using SchoolOfDev.Exceptions;
 using SchoolOfDev.Helpers;
 
 namespace SchoolOfDev.Services
@@ -28,7 +29,7 @@ namespace SchoolOfDev.Services
 
             if (courseDb is not null)
             {
-                throw new Exception($"Curso {Course.Name} já cadastro no sistema.");
+                throw new KeyNotFoundException($"Curso {Course.Name} já cadastro no sistema.");
             }
 
             _context.Courses.Add(Course);
@@ -43,7 +44,7 @@ namespace SchoolOfDev.Services
 
             if (courseDb is null)
             {
-                throw new Exception("Curso não localizado em nosso banco de dados.");
+                throw new KeyNotFoundException("Curso não localizado em nosso banco de dados.");
             }
 
             _context.Courses.Remove(courseDb);
@@ -61,7 +62,7 @@ namespace SchoolOfDev.Services
 
             if (courseDb is null)
             {
-                throw new Exception("Curso não localizado em nosso banco de dados.");
+                throw new BadRequestException("Curso não localizado em nosso banco de dados.");
             }
 
             return courseDb;
@@ -72,14 +73,14 @@ namespace SchoolOfDev.Services
 
             if (CourseIn.Id != id)
             {
-                throw new Exception("ID da rota é diferente do ID do curso.");
+                throw new BadRequestException("ID da rota é diferente do ID do curso.");
             }
 
             Course courseDb = await _context.Courses.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
 
             if (courseDb is null)
             {
-                throw new Exception("Curso não localizado em nosso banco de dados.");
+                throw new KeyNotFoundException("Curso não localizado em nosso banco de dados.");
             }
 
             CourseIn.CreatedAt = courseDb.CreatedAt;

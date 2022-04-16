@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolOfDev.Helpers;
+using SchoolOfDev.Middleware;
 using SchoolOfDev.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,10 +25,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

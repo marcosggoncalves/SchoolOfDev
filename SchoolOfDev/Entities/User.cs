@@ -1,4 +1,5 @@
 ﻿using SchoolOfDev.Enuns;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolOfDev.Entities
 {
@@ -11,8 +12,12 @@ namespace SchoolOfDev.Entities
         public string? LastName { get; set; }
 
         public string? Password { get; set; }
+        [NotMapped]
+        public string? ConfirmPassword { get; set; }
+        [NotMapped]
+        public string? CurrentPassword { get; set; }
 
-        public  int Age { get; set; }
+        public int Age { get; set; }
 
         public TypeUser TypeUser { get; set; }
     }

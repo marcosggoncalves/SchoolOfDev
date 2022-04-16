@@ -1,6 +1,7 @@
-﻿ using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SchoolOfDev.Entities;
 using SchoolOfDev.Helpers;
+using BC = BCrypt.Net.BCrypt;
 
 namespace SchoolOfDev.Services
 {
@@ -23,12 +24,19 @@ namespace SchoolOfDev.Services
 
         public async Task<User> Create(User user)
         {
+
+            if (!user.Password.Equals(user.ConfirmPassword)) {
+                throw new Exception("Senhas não conferem.");
+            }
+
             User userDb = await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.UserName == user.UserName);
 
             if(userDb is not null)
             {
                 throw new Exception($"Usuário {user.UserName} já cadastro no sistema.");
             }
+
+            user.Password = BC.HashPassword(user.Password);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -72,6 +80,9 @@ namespace SchoolOfDev.Services
             if (userIn.Id != id)
             {
                 throw new Exception("ID da rota é diferente do ID do usuário.");
+            }else if (!userIn.Password.Equals(userIn.ConfirmPassword))
+            {
+                throw new Exception("Senhas não conferem.");
             }
 
             User userDb = await _context.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
@@ -80,6 +91,13 @@ namespace SchoolOfDev.Services
             {
                 throw new Exception("Usuário não localizado em nosso banco de dados.");
             }
+            else if (!BC.Verify(userIn.CurrentPassword, userDb.Password))
+            {
+                throw new Exception("Senha atual incorreta, não foi possivel alterar senha.");
+            }
+
+            userIn.CreatedAt = userDb.CreatedAt;
+            userIn.Password = BC.HashPassword(userIn.Password);
 
             _context.Entry(userIn).State = EntityState.Modified;
             await _context.SaveChangesAsync();

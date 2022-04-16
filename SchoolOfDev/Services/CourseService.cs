@@ -82,6 +82,8 @@ namespace SchoolOfDev.Services
                 throw new Exception("Curso não localizado em nosso banco de dados.");
             }
 
+            CourseIn.CreatedAt = courseDb.CreatedAt;
+
             _context.Entry(CourseIn).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }

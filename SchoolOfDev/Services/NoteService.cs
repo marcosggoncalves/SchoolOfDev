@@ -75,6 +75,8 @@ namespace SchoolOfDev.Services
                 throw new Exception("Curso não localizado em nosso banco de dados.");
             }
 
+            NoteIn.CreatedAt = noteDb.CreatedAt;
+
             _context.Entry(NoteIn).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }

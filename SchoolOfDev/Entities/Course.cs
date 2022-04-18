@@ -1,8 +1,16 @@
-﻿namespace SchoolOfDev.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace SchoolOfDev.Entities
 {
     public class Course : BaseEntity
     {
+        public  int  TeacherId  { get; set; }
         public string? Name { get; set; }
-        public Decimal Price { get; set; }
+        public decimal Price { get; set; }
+        public virtual User Teacher { get; set; }
+        [JsonIgnore]
+        public ICollection<User> Students { get; set; }
+        [JsonIgnore]
+        public List<StudentCourse> StudentCourses { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SchoolOfDev.Enuns;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SchoolOfDev.Entities
 {
@@ -20,5 +21,11 @@ namespace SchoolOfDev.Entities
         public int Age { get; set; }
 
         public TypeUser TypeUser { get; set; }
+        [JsonIgnore]
+        public ICollection<Course> CoursesTeaching { get; set; }
+        [JsonIgnore]
+        public ICollection<Course> CoursesStuding { get; set; }
+        [JsonIgnore]
+        public List<StudentCourse> StudentCourses { get; set; }
     }
 }

@@ -9,6 +9,8 @@ namespace SchoolOfDev.Profiles
             return new MapperConfiguration(config =>
             {
                 config.AddProfile(new UserProfile());
+                config.AddProfile(new NoteProfile());
+                config.AddProfile(new CourseProfile());
             });
         }
     }

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using SchoolOfDev.DTO.Note;
 using SchoolOfDev.Entities;
 using SchoolOfDev.Exceptions;
 using SchoolOfDev.Helpers;
@@ -7,28 +9,32 @@ namespace SchoolOfDev.Services
 {
     public interface INoteService
     {
-        public Task<Note> Create(Note Note);
-        public Task<Note> GetById(int id);
-        public Task<List<Note>> GetAll();
-        public Task Update(Note NoteIn, int id);
+        public Task<NoteResponse> Create(NoteRequest Note);
+        public Task<NoteResponse> GetById(int id);
+        public Task<List<NoteResponse>> GetAll();
+        public Task Update(NoteRequest NoteIn, int id);
         public Task Delete(int id);
     }
 
     public class NoteService : INoteService
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public NoteService(DataContext context)
+        public NoteService(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<Note> Create(Note Note)
+        public async Task<NoteResponse> Create(NoteRequest noteRequest)
         {
-            _context.Notes.Add(Note);
+            Note note = _mapper.Map<Note>(noteRequest); 
+
+            _context.Notes.Add(note);
             await _context.SaveChangesAsync();
 
-            return Note;
+            return _mapper.Map<NoteResponse>(note);
         }
 
         public async Task Delete(int id)
@@ -44,12 +50,13 @@ namespace SchoolOfDev.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Note>> GetAll()
+        public async Task<List<NoteResponse>> GetAll()
         {
-            return await _context.Notes.ToListAsync();
+            List<Note> notes = await _context.Notes.ToListAsync();
+            return notes.Select(n => _mapper.Map<NoteResponse>(n)).ToList();
         }
 
-        public async Task<Note> GetById(int id)
+        public async Task<NoteResponse> GetById(int id)
         {
             Note noteDb = await _context.Notes.SingleOrDefaultAsync(u => u.Id == id);
 
@@ -58,13 +65,13 @@ namespace SchoolOfDev.Services
                 throw new BadRequestException("Curso não localizado em nosso banco de dados.");
             }
 
-            return noteDb;
+            return _mapper.Map<NoteResponse>(noteDb);
         }
 
-        public async Task Update(Note NoteIn, int id)
+        public async Task Update(NoteRequest noteRequest, int id)
         {
 
-            if (NoteIn.Id != id)
+            if (noteRequest.Id != id)
             {
                 throw new BadRequestException("ID da rota é diferente do ID do curso.");
             }
@@ -76,9 +83,9 @@ namespace SchoolOfDev.Services
                 throw new KeyNotFoundException("Curso não localizado em nosso banco de dados.");
             }
 
-            NoteIn.CreatedAt = noteDb.CreatedAt;
+            noteDb = _mapper.Map<Note>(noteRequest);
 
-            _context.Entry(NoteIn).State = EntityState.Modified;
+            _context.Entry(noteDb).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
     }

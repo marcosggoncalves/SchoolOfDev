@@ -1,10 +1,10 @@
-﻿using SchoolOfDev.Entities;
-using SchoolOfDev.Enuns;
+﻿using SchoolOfDev.Enuns;
 
 namespace SchoolOfDev.DTO.User
 {
-    public class UserResponse : BaseEntity
+    public class UserResponse
     {
+        public int Id { get; set; }
         public string? FirstName { get; set; }
 
         public string? UserName { get; set; }
@@ -13,8 +13,12 @@ namespace SchoolOfDev.DTO.User
 
         public TypeUser TypeUser { get; set; }
 
-        public List<Course> CoursesStuding { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public List<Course> CoursesTeaching { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        public List<Entities.Course> CoursesStuding { get; set; }
+
+        public List<Entities.Course> CoursesTeaching { get; set; }
     }
 }

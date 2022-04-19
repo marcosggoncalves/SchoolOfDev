@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolOfDev.DTO.Note; 
+using SchoolOfDev.Authorization;
+using SchoolOfDev.DTO.Note;
+using SchoolOfDev.Enuns;
 using SchoolOfDev.Services;
 
 namespace SchoolOfDev.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class NoteController : ControllerBase
@@ -28,12 +31,14 @@ namespace SchoolOfDev.Controllers
             return Ok(await _service.GetById(id));
         }
 
+        [Authorize(TypeUser.Teacher, TypeUser.Both)]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] NoteRequest Note)
         {
             return Ok(await _service.Create(Note));
         }
 
+        [Authorize(TypeUser.Teacher, TypeUser.Both)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] NoteRequest NoteIn, int id)
         {
@@ -41,6 +46,7 @@ namespace SchoolOfDev.Controllers
             return NoContent();
         }
 
+        [Authorize(TypeUser.Teacher, TypeUser.Both)]
         [HttpDelete]
         public async Task<IActionResult> DeleteById(int id)
         {
